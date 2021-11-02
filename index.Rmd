@@ -19,15 +19,21 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 
 ## Data Wrangling, Exploration, Visualization
 
-### Name and EID here
+### Tejas Karuturi, tk22543
 
 #### Introduction 
 
 Paragraph or two introducing your datasets and variables, why they are interesting to you, etc.
 
+*The datasets I chose are about Pokemon. I used to play Pokemon a lot back when I was younger, and I still play quite a bit to this day. One of my favorite content creators makes fire music about Pokemon, which made me even more interested. The first Pokemon dataset contains a Pokedex from Generation 1 to Generation 6, covering the Name, its typings, its stats, its generation, and whether it is a legendary pokemon or not. The second Pokemon dataset contains a Pokedex from Generation 1 to Generation 8, covering the Pokedex number, the pokemon name, its height and weight, its base experience, and whether it is a default pokemon.*
+
 ```{R}
 # read your datasets in here, e.g., with read_csv()
-
+library(tidyverse)
+pokemon1 <- read_csv("pokemon_dataset_1.csv")
+pokemon2 <- read_csv("pokemon_dataset_2.csv")
+pokemon1
+pokemon2
 ```
 
 #### Tidying: Reshaping
@@ -36,6 +42,10 @@ If your datasets are tidy already, demonstrate that you can reshape data with pi
 
 ```{R}
 # your tidying code (if applicable; can also wait until wrangling section)
+poke1 <- pokemon1 %>% mutate(Name = tolower(Name))
+poke2 <- pokemon2 %>% select(-id, -order, -species_id)
+poke1
+poke2
 ```
 
     
@@ -43,44 +53,92 @@ If your datasets are tidy already, demonstrate that you can reshape data with pi
 
 ```{R}
 # your joining code
+poke_join <- poke1 %>% full_join(poke2, by=c(Name="identifier")) %>% drop_na(ID)
+poke_join
 
 # your joining code
 ```
 
 Discussions of joining here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
 
+*A full join was applied on both the datasets based on the Name column from the first dataset being equal to the identifier column from the second dataset. This resulted in a dataset that included Generations 1 through 8. The issue with the full join was that Pokemon in Generations 7 and 8 had a lot of NA values, so a drop was applied to the ID fields that had an NA value, removing the Generation 7 and Generation 8 pokemon. The final joined dataset contains pokemon from Generations 1 through 6 with the names, types, stats, generation, etc. There are a total of 800 observations in the joined dataset, while there was 800 rows in the first dataset and 1092 rows in the second dataset. The number of unique IDs in the merged dataset is the same number of unique IDs in the first dataset, which is 721. The number of unique IDs in the second dataset is 1092. The IDs that appear in the merged dataset are those that match the pokemon from generations 1-6, which both datasets have in common, and the IDs that don't appear in the merged dataset are those that match the pokemon from generations 7-8.*
+
 ####  Wrangling
 
 ```{R}
 # your wrangling code
+knitr::kable(poke_join %>% summarize(Mean=mean(Total, na.rm=T), SD=sd(Total, na.rm=T), Variance=var(Total, na.rm=T), Minimum=min(Total, na.rm=T), Maximum=max(Total, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(HP, na.rm=T), SD=sd(HP, na.rm=T), Variance=var(HP, na.rm=T), Minimum=min(HP, na.rm=T), Maximum=max(HP, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(Attack, na.rm=T), SD=sd(Attack, na.rm=T), Variance=var(Attack, na.rm=T), Minimum=min(Attack, na.rm=T), Maximum=max(Attack, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(Defense, na.rm=T), SD=sd(Defense, na.rm=T), Variance=var(Defense, na.rm=T), Minimum=min(Defense, na.rm=T), Maximum=max(Defense, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(`Sp. Atk`, na.rm=T), SD=sd(`Sp. Atk`, na.rm=T), Variance=var(`Sp. Atk`, na.rm=T), Minimum=min(`Sp. Atk`, na.rm=T), Maximum=max(`Sp. Atk`, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(`Sp. Def`, na.rm=T), SD=sd(`Sp. Def`, na.rm=T), Variance=var(`Sp. Def`, na.rm=T), Minimum=min(`Sp. Def`, na.rm=T), Maximum=max(`Sp. Def`, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(Speed), SD=sd(Speed, na.rm=T), Variance=var(Speed, na.rm=T), Minimum=min(Speed, na.rm=T), Maximum=max(Speed, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(height, na.rm=T), SD=sd(height, na.rm=T), Variance=var(height, na.rm=T), Minimum=min(height, na.rm=T), Maximum=max(height, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(weight, na.rm=T), SD=sd(weight, na.rm=T), Variance=var(weight, na.rm=T), Minimum=min(weight, na.rm=T), Maximum=max(weight, na.rm=T)))
+
+knitr::kable(poke_join %>% summarize(Mean=mean(base_experience, na.rm=T), SD=sd(base_experience, na.rm=T), Variance=var(base_experience, na.rm=T), Minimum=min(base_experience, na.rm=T), Maximum=max(base_experience, na.rm=T)))
 
 # your wrangling code
+poke_join %>% group_by(Generation) %>% summarize(count=n(), mean=count/nrow(poke_join))
+poke_join %>% filter(Total > mean(Total, na.rm = T))
+poke_join %>% group_by(`Type 1`) %>% summarize(count=n()) %>% arrange(-count)
+poke_join %>% group_by(`Type 2`) %>% summarize(count=n()) %>% arrange(-count) %>% na.omit()
+poke_join %>% select(Name, is_default, Legendary)
+poke_join %>% mutate(BMI = (weight/(height*height))*10)
 
 # your wrangling code
+poke_join %>% group_by(Generation) %>% pivot_wider() %>% summarize(count=n()) %>% arrange(-count)
+poke_join %>% filter(str_detect(Name, ".*-.*"))
 ```
 
 Your discussion of wrangling section here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
+
+*I applied summary statistics for each numerical variable in my joined dataset. For those summary statistics, I found the mean, the standard deviation, the variance, the minimum value, and the maximum value. For the categorical variables, I used group_by, summarize, and count to find the proportions of pokemon for each generation. I used filter to get the pokemon with their total stats higher than the average total stats. I used arrange to get the types with the most number of pokemon for Type 1 and Type 2. I used select to get the dataset with the pokemon names, their default status, and their legendary status. For mutate, I created a new variable called BMI to find each pokemon's body mass index.*
+
+*For the tidying section, the joined dataset was already tidy enough, so I used pivot_wider to find the generation with the most number of pokemon. I ended up getting the same results for the counts, and my dataset didn't really change, which proved that my joined dataset was tidy enough beforehand.*
+
+*For the regex, I filtered the data on pokemon that contained dashes in their names. This results in data with pokemon that mostly have special forms, such as alternate forms or mega evolution forms. Most of these pokemon, outside of pokemon such as the Nidorans, Deoxys-Normal, and Wormadam-Plant are not default pokemon.*
 
 
 #### Visualizing
 
 ```{R}
+library(ggplot2)
 # your plot 1
+ggplot(data=poke_join, mapping=aes(x=Total, fill=Generation)) + geom_density() + geom_rug() + facet_grid(Generation~.) + ggtitle("Pokemon Total Stats by Generation")
 ```
 
 Your discussion of plot 1
 
+*This is a density plot of Total Stats based on the Generation that the Pokemon is from. This plot is interesting because it gives an idea of the frequency of pokemon in each generation with a certain number for their total stats. Generations 4 and 5 have the highest peak densities at their given total stats, meaning that there are a lot of pokemon that cover a certain total stats range.*
+
 ```{R}
 # your plot 2
+#ggplot(data=poke_join, mapping=aes(x=height, y=base_experience, color=`Type 2`)) + geom_point() + facet_wrap(Generation~.) + ggtitle("Pokemon Base Experience over Height")
+ggplot(data=poke_join, mapping=aes(x=height, y=base_experience)) + geom_boxplot() + geom_jitter(alpha=.5, aes(color=`Type 2`)) + facet_wrap(Generation~.) + ggtitle("Pokemon Base Experience over Height")
 ```
 
 Your discussion of plot 2
 
+*This is a boxplot that shows the relationship between pokemon height and base experience with jitter points that show each pokemon type. This plot is interesting because it shows different plots based on generation and it differentiates between the second pokemon type. Both Generations 1 and 2 have outliers in their boxplots, meaning they have pokemon with significantly large base experiences.*
+
 ```{R}
 # your plot 3
+ggplot(data=poke_join, mapping=aes(x=Legendary, y=weight)) + geom_bar(stat="summary") + geom_errorbar(stat="summary", width=.5) + ggtitle("Pokemon Weight over Legendary Status")
 ```
 
 Your discussion of plot 3
+
+*This is a bar plot that shows the relationship of the pokemon weight to its legendary status. This plot is interesting because it shows that legendary pokemon tend to weigh more despite there being a small percentage.*
 
 #### Concluding Remarks
 
