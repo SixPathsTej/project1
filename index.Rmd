@@ -89,15 +89,19 @@ knitr::kable(poke_join %>% summarize(Mean=mean(base_experience, na.rm=T), SD=sd(
 
 # your wrangling code
 poke_join %>% group_by(Generation) %>% summarize(count=n(), mean=count/nrow(poke_join))
-poke_join %>% filter(Total > mean(Total, na.rm = T))
+poke_aboveavg_total <- poke_join %>% filter(Total > mean(Total, na.rm = T))
+head(poke_aboveavg_total)
 poke_join %>% group_by(`Type 1`) %>% summarize(count=n()) %>% arrange(-count)
 poke_join %>% group_by(`Type 2`) %>% summarize(count=n()) %>% arrange(-count) %>% na.omit()
-poke_join %>% select(Name, is_default, Legendary)
-poke_join %>% mutate(BMI = (weight/(height*height))*10)
+poke_default_legend <- poke_join %>% select(Name, is_default, Legendary)
+head(poke_default_legend)
+poke_bmi <- poke_join %>% mutate(BMI = (weight/(height*height))*10)
+head(poke_bmi)
 
 # your wrangling code
 poke_join %>% group_by(Generation) %>% pivot_wider() %>% summarize(count=n()) %>% arrange(-count)
-poke_join %>% filter(str_detect(Name, ".*-.*"))
+poke_hyphen <- poke_join %>% filter(str_detect(Name, ".*-.*"))
+head(poke_hyphen)
 ```
 
 Your discussion of wrangling section here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
