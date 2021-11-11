@@ -32,8 +32,8 @@ Paragraph or two introducing your datasets and variables, why they are interesti
 library(tidyverse)
 pokemon1 <- read_csv("pokemon_dataset_1.csv")
 pokemon2 <- read_csv("pokemon_dataset_2.csv")
-pokemon1
-pokemon2
+head(pokemon1)
+head(pokemon2)
 ```
 
 #### Tidying: Reshaping
@@ -44,8 +44,8 @@ If your datasets are tidy already, demonstrate that you can reshape data with pi
 # your tidying code (if applicable; can also wait until wrangling section)
 poke1 <- pokemon1 %>% mutate(Name = tolower(Name))
 poke2 <- pokemon2 %>% select(-id, -order, -species_id)
-poke1
-poke2
+head(poke1)
+head(poke2)
 ```
 
     
@@ -54,7 +54,7 @@ poke2
 ```{R}
 # your joining code
 poke_join <- poke1 %>% full_join(poke2, by=c(Name="identifier")) %>% drop_na(ID)
-poke_join
+head(poke_join)
 
 # your joining code
 ```
